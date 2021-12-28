@@ -1,37 +1,35 @@
-int Solution::numDecodings(string A) {
-    // Do not write main() function.
-    // Do not read input, instead use the arguments to the function.
-    // Do not print the output, instead return values as specified
-    // Still have a doubt. Checkout www.interviewbit.com/pages/sample_codes/ for more details
-    
-    if(A.size() == 0){
-        return 0;
+int helper(string &s,vector<int>&dp,int index)
+{
+    int mod=pow(10,9)+7;
+    if(index==s.length())
+    {
+        return dp[index]=1;
     }
-    else if(A[0] == '0'){
-        return 0;
+    if(s[index]=='0')
+    {
+        return dp[index]=0;
     }
-    else if(A.size() == 1){
-        return 1;
+    if(dp[index]!=-1)
+    {
+        return dp[index];
     }
-    
-    vector<int> temp(A.size()+1);
-    
-    temp[0] = 1;
-    temp[1] = 1;
-    
-    for(int i = 2; i < temp.size(); i++){
-        temp[i] = 0;
-        
-        if(A[i-1] - '0' > 0){
-            temp[i] = temp[i-1];
+    if(dp[index+1]==-1)
+    {
+        dp[index+1]=(helper(s,dp,index+1)%mod);
+    }
+    int res=dp[index+1];
+    if(index+1<s.length() && (s[index]=='1' || (s[index]=='2' && s[index+1]<='6')))
+    {
+        if(dp[index+2]==-1)
+        {
+            dp[index+2]=(helper(s,dp,index+2)%mod);
         }
-        if(A[i-1] == '0' && A[i-2] > '2'){
-            return 0;
-        }
-        if((A[i-2] - '0' < 2 && A[i-2] - '0' > 0) || (A[i-2] - '0' == 2 && A[i-1] - '0' <= 6)){
-            temp[i] = temp[i] + temp[i-2];
-        }
+        res=(res+dp[index+2])%mod;
     }
-    
-    return temp[temp.size()-1];
+    return dp[index]=res;
+}
+int Solution::numDecodings(string A) 
+{
+    vector<int>dp(A.length()+1,-1);
+    return helper(A,dp,0);
 }
